@@ -7,7 +7,8 @@ export class StudentController {
   private studentRepository = getRepository(Student)
 
   async allStudents(request: Request, response: Response, next: NextFunction) {
-    return this.studentRepository.find()
+    const returnResponse = await this.studentRepository.find()
+    return returnResponse
   }
 
   async createStudent(request: Request, response: Response, next: NextFunction) {
@@ -20,28 +21,29 @@ export class StudentController {
     }
     const student = new Student()
     student.prepareToCreate(createStudentInput)
-
-    return this.studentRepository.save(student)
+    const returnResponse = await this.studentRepository.save(student)
+    return returnResponse
   }
 
   async updateStudent(request: Request, response: Response, next: NextFunction) {
     const { body: params } = request
+    const studentToUpdate = await this.studentRepository.findOne(params.id)
 
-    this.studentRepository.findOne({ where: { id: params.id } }).then((student) => {
-      const updateStudentInput: UpdateStudentInput = {
-        id: params.id,
-        first_name: params.first_name,
-        last_name: params.last_name,
-        photo_url: params.photo_url,
-      }
-      student.prepareToUpdate(updateStudentInput)
-      return this.studentRepository.save(student)
-    })
+    const updateStudentInput: UpdateStudentInput = {
+      id: params.id,
+      first_name: params.first_name,
+      last_name: params.last_name,
+      photo_url: params.photo_url,
+    }
+    studentToUpdate.prepareToUpdate(updateStudentInput)
+    const returnResponse = this.studentRepository.save(updateStudentInput)
+    return returnResponse
   }
 
   async removeStudent(request: Request, response: Response, next: NextFunction) {
-    let studentToRemove = await this.studentRepository.findOne({where : {id : request.query.id}})
-    console.log("studentToRemove is : ",studentToRemove);
-    await this.studentRepository.remove(studentToRemove)
+    let studentToRemove = await this.studentRepository.findOne(request.query.id)
+    console.log("studentToRemove is : ", studentToRemove)
+    const returnResponse = await this.studentRepository.remove(studentToRemove)
+    return returnResponse
   }
 }

@@ -10,7 +10,8 @@ export class GroupController {
     // Task 1: 
 
     // Return the list of all groups
-    return this.groupRepository.find()
+    const returnResponse = await this.groupRepository.find()
+    return returnResponse
 
   }
 
@@ -19,7 +20,6 @@ export class GroupController {
 
     // Add a Group
     try {
-      console.log("createGroup started and request is : ", request);
       const { body: params } = request
 
       const createGroupInput: CreateGroupInput = {
@@ -34,7 +34,8 @@ export class GroupController {
       const group = new Group()
       group.prepareToCreate(createGroupInput)
 
-      return this.groupRepository.save(group)
+      const returnResponse = await this.groupRepository.save(group)
+      return returnResponse
 
     } catch (error) {
       console.log(error);
@@ -45,32 +46,33 @@ export class GroupController {
   async updateGroup(request: Request, response: Response, next: NextFunction) {
     // Task 1: 
 
-    // Update a Group
+    // Update a Group    
     const { body: params } = request
+    const groupToUpdate = await this.groupRepository.findOne(params.id)
 
-    this.groupRepository.findOne({ where: { id: params.id } }).then((group) => {
-      const updateGroupInput: UpdateGroupInput = {
-        id: params.id,
-        name: params.name,
-        number_of_weeks: params.number_of_weeks,
-        roll_states: params.roll_states,
-        incidents: params.incidents,
-        ltmt: params.ltmt,
-        run_at: params.run_at,
-        student_count: params.student_count,
-      }
-      group.prepareToUpdate(updateGroupInput)
-      return this.groupRepository.save(group)
-    })
+    const updateGroupInput: UpdateGroupInput = {
+      id: params.id,
+      name: params.name,
+      number_of_weeks: params.number_of_weeks,
+      roll_states: params.roll_states,
+      incidents: params.incidents,
+      ltmt: params.ltmt,
+      run_at: params.run_at,
+      student_count: params.student_count,
+    }
+    groupToUpdate.prepareToUpdate(updateGroupInput)
+    const returnResponse = this.groupRepository.save(updateGroupInput)
+    return returnResponse
   }
 
   async removeGroup(request: Request, response: Response, next: NextFunction) {
     // Task 1: 
 
     // Delete a Group
-    let groupToRemove = await this.groupRepository.findOne({where : {id : request.query.id}})
-    console.log("groupToRemove is : ",groupToRemove);
-    await this.groupRepository.remove(groupToRemove)
+    let groupToRemove = await this.groupRepository.findOne(request.query.id)
+    console.log("groupToRemove is : ", groupToRemove);
+    const returnResponse = await this.groupRepository.remove(groupToRemove)
+    return returnResponse
   }
 
   async getGroupStudents(request: Request, response: Response, next: NextFunction) {
