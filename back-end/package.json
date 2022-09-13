@@ -3,7 +3,9 @@
    "version": "0.0.1",
    "private": true,
    "description": "Awesome project developed with TypeORM.",
-   "devDependencies": {},
+   "devDependencies": {
+      "nodemon": "^2.0.19"
+   },
    "dependencies": {
       "@types/node": "^18.7.14",
       "body-parser": "^1.20.0",
@@ -17,6 +19,7 @@
       "typescript": "^4.8.2"
    },
    "scripts": {
-      "start": "ts-node src/index.ts"
+      "start": "ts-node src/index.ts",
+      "nodemon": "nodemon src/index.ts"
    }
 }

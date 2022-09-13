@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm"
+import { getRepository, ObjectID } from "typeorm"
 import { NextFunction, Request, Response } from "express"
 import { Student } from "../entity/student.entity"
 import { CreateStudentInput, UpdateStudentInput } from "../interface/student.interface"
@@ -27,7 +27,7 @@ export class StudentController {
   async updateStudent(request: Request, response: Response, next: NextFunction) {
     const { body: params } = request
 
-    this.studentRepository.findOne(params.id).then((student) => {
+    this.studentRepository.findOne({ where: { id: params.id } }).then((student) => {
       const updateStudentInput: UpdateStudentInput = {
         id: params.id,
         first_name: params.first_name,
@@ -35,13 +35,13 @@ export class StudentController {
         photo_url: params.photo_url,
       }
       student.prepareToUpdate(updateStudentInput)
-
       return this.studentRepository.save(student)
     })
   }
 
   async removeStudent(request: Request, response: Response, next: NextFunction) {
-    let studentToRemove = await this.studentRepository.findOne(request.params.id)
+    let studentToRemove = await this.studentRepository.findOne({where : {id : request.query.id}})
+    console.log("studentToRemove is : ",studentToRemove);
     await this.studentRepository.remove(studentToRemove)
   }
 }
